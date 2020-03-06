@@ -30,7 +30,6 @@ www/
 $RECYCLE.BIN/
 uploads/
 
-mongo-data.config.json
 firebase-adminsdk.json
 
 .DS_Store
