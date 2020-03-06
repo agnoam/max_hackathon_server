@@ -12,6 +12,6 @@ export function initializeFirebase(): void {
   });
 }
 
-// The app only has access as defined in the Security Rules
+// The app only have access as defined in the Security Rules
 export const db: database.Database = admin.database();
 export const auth: fbaseAuth.Auth = admin.auth();

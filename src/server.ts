@@ -26,7 +26,6 @@ Object.keys(ifaces).forEach((ifname) => {
     if (alias < 1) {
       localIP = iface.address;
     }
-    
     ++alias;
   });
 });
