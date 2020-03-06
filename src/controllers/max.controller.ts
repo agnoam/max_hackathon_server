@@ -19,8 +19,7 @@ export module MaxRequests {
             console.error(ex);
         }
     }
-
-    export async function cardActivate(requestData: { AccountId?: number, ValidThru?: string, SecurityCode?: string }) {
+    export async function cardActivate(requestData: CardActivateData): Promise<any> {
         try {
             const res: axios.AxiosResponse = await axios.default.post(
                 `${ serverURL }/ActivateCard`, requestData, { headers: defaultHeaders });
@@ -36,6 +35,12 @@ export module MaxRequests {
     }
 }
 
-interface PrePaidRP{
+interface CardActivateData {
+    AccountId?: number;
+    ValidThru?: string; 
+    SecurityCode?: string;
+}
+
+interface PrePaidRP {
     null: null
 }
