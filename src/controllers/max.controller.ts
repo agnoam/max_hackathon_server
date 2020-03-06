@@ -1,6 +1,4 @@
-import * as soap from 'soap';
 import * as axios from 'axios';
-import * as http from 'http';
 
 export module MaxRequests {
     const token: string = '';
@@ -11,7 +9,7 @@ export module MaxRequests {
         "applicationToken": token
     }
 
-    export async function accountAdd(requestData: { AccountId?: number, Currency?: string }) {
+    export async function accountAdd(requestData: { AccountId?: number, Currency?: string }): Promise<any> {
         try {
             const res: axios.AxiosResponse = await axios.default.post(
                 `${ serverURL }/AccountAdd`, requestData, { headers: defaultHeaders });
