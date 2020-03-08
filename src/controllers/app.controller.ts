@@ -23,14 +23,15 @@ export module AppCtrl {
     export async function login_R(req: Request, res: Response): Promise<Response> {
         const reqBody: LoginRequestBody = req.body;
         if(reqBody.username && reqBody.password) {
-            // Encrypting the password with md5
-            const userData: IUser = await isLegit(reqBody.username, reqBody.password);
-            if(userData) {
-                return res.status(ResponseStatus.Ok).json({
-                    name: userData.name,
-                    profileImage: userData.profileImage,
-                    date: userData.date
-                });
+            try {
+                // Encrypting the password with md5
+                const userData: IUser = await isLegit(reqBody.username, reqBody.password);
+                if(userData) {
+                    await userData.updateOne({ lastConnected: Date.now() }).exec();
+                    return res.status(ResponseStatus.Ok).json(userData);
+                }
+            } catch(ex) {
+                console.error(ex);
             }
         }
 
@@ -44,19 +45,22 @@ export module AppCtrl {
             username: req.body.username,
             password: md5(req.body.password),
             email: req.body.email,
-            name: req.body.name,
-            profileImage: req.body.profileImagePath
+            name: req.body.name
         }
 
         if(userData.username && userData.password && userData.email && userData.name) {
-            // Deletes the profileImage if does not exists
-            !userData.profileImage ? delete userData.profileImage : null;
-
+            const userExists: UserExists = await isUserExists({ username: userData.username, email: userData.email });
             try {
-                await UserModel.create(userData);
-                return res.status(ResponseStatus.Ok).json({ description: 'User created successfuly' });
+                if(userExists === UserExists.Not) {
+                    await UserModel.create(userData);
+                    return res.status(ResponseStatus.Ok).json({ description: 'User created successfuly' });
+                } else if(userExists === UserExists.Email) {
+                    return res.status(ResponseStatus.Ok).json({ description: 'This email already used' });
+                } else {
+                    return res.status(ResponseStatus.Ok).json({ description: 'This username already used' });
+                }
             } catch(ex) {
-                console.error('MongoDB creation ex: ', ex);
+                console.error(ex);
             }
         }
 
@@ -85,6 +89,24 @@ export module AppCtrl {
         }
     }
 
+    async function isUserExists(data: { username?: string, email?: string }): Promise<UserExists> {
+        let userMatch: IUser[] = [];
+        let emailMatch: IUser[] = [];
+        let res: UserExists = UserExists.Not;
+
+        if(data.username) {
+            userMatch = await UserModel.find({ username: data.username }).exec();
+            res = UserExists.Username;
+        }
+
+        if(data.email) {
+            emailMatch = await UserModel.find({ email: data.email }).exec();
+            res = UserExists.Email;
+        }
+
+        return res;
+    }
+
     async function isLegit(username: string, password: string): Promise<IUser> {
         try {
             const userQuery: DocumentQuery<IUser, IUser> = UserModel.findOne({ username: username });
@@ -100,90 +122,15 @@ export module AppCtrl {
             console.error(`ex with querying mongodb: `, ex);
         }
     }
-
-    /*********************************** Firebase Read / Write / Delete Example ***********************************/
-    // async function firebaseLogin(username: string, password: string): Promise<boolean> {
-    //     try {
-    //         const userQuery: database.Query = db.ref(`/users/`).child('username').equalTo(username);
-    //         const snapshot: database.DataSnapshot = await userQuery.once('value');
-            
-    //         if(snapshot.exists()) {
-    //             const user: User = snapshot.val();
-    //             if(user.password === md5(password)) {
-    //                 return true;
-    //             }
-    //             return false;
-    //         }
-
-    //         throw "User doesn't exists";
-    //     } catch(ex) {
-    //         throw ex;
-    //     }
-    // }
-
-    // async function firebaseSignUp(user: User): Promise<string> {
-    //     const usersRef: database.Reference = db.ref('/users');
-        
-    //     if(user.password && user.email && user.name && user.username) {
-    //         user.password = md5(user.password);
-    //         user.profileImage = !user.profileImage ? userDefaultImage : user.profileImage;
-    //         user.date = !user.date ? Date.now() : user.date;
-
-    //         if(!await firebaseIsExists({ username: user.username, email: user.email })) {
-    //             try {
-    //                 const newRef: database.Reference = await usersRef.push(user);
-    //                 return newRef.key;
-    //             } catch(ex) {
-    //                 throw { description: 'firebase push ex', data: ex };
-    //             }
-    //         }
-    //     }
-    //     throw 'Missing reqired propery of the user';
-    // }
-
-    // async function firebaseIsExists(data: { username?: string, email?: string }): Promise<string> {
-    //     if(data.username || data.email) {
-    //         const usersRef: database.Reference = db.ref('/users');
-
-    //         if(data.username) {
-    //             try {
-    //                 return await firebaseIsValueExists(usersRef, 'username', data.username);
-    //             } catch(ex) { 
-    //                 throw { description: 'username query firebase ex', data: ex }; 
-    //             }
-    //         } else if(data.email) {
-    //             try {
-    //                 return await firebaseIsValueExists(usersRef, 'email', data.email);
-    //             } catch(ex) { 
-    //                 throw { description: 'email query firebase ex', data: ex }; 
-    //             }
-    //         }
-    //     }
-
-    //     throw 'Data must have username or email, Fill the data and try again';
-    // }
-
-    // async function firebaseIsValueExists(ref: database.Reference, childName: string, equalTo: any): Promise<string> {
-    //     const usernameQuery: database.Query = ref.child(childName).equalTo(equalTo);
-    //     const snapshot: database.DataSnapshot = await usernameQuery.once('value');
-        
-    //     return !snapshot.exists() ? snapshot.key : null;
-    // }
-
-    // async function firebaseDelete(userID: string): Promise<void> {
-    //     try {
-    //         const userRef: database.Reference = db.ref(`/users/${userID}`);
-    //         await userRef.remove();
-    //     } catch(ex) {
-    //         throw {
-    //             description: 'firebase database user remove ex',
-    //             data: ex
-    //         }
-    //     }
-    // }
 }
 
 interface LoginRequestBody {
     username: string;
     password: string;
+}
+
+enum UserExists {
+    Not,
+    Email,
+    Username
 }

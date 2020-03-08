@@ -12,5 +12,14 @@ export enum ResponseStatus {
 }
 
 export enum CollectionsNames {
-    Users = 'users'
+    Users = 'users',
+    Transactions = 'transactions',
+    Accounts = 'accounts'
+}
+
+export enum Category {
+    Transaction = 'Transaction',
+    Technology = 'Technology',
+    Vacation = 'Vacation',
+    Resturant = 'Resturants' 
 }
