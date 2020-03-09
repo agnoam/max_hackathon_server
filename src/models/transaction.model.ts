@@ -27,4 +27,4 @@ TransactionSchema.pre<ITransaction>('save', async (next: HookNextFunction) => {
     }
 });
 
-export const UserModel: Model<ITransaction> = model<ITransaction>(CollectionsNames.Transactions, TransactionSchema);
+export const TransactionModel: Model<ITransaction> = model<ITransaction>(CollectionsNames.Transactions, TransactionSchema);

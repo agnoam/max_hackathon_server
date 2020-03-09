@@ -21,5 +21,5 @@ export enum Category {
     Transaction = 'Transaction',
     Technology = 'Technology',
     Vacation = 'Vacation',
-    Resturant = 'Resturants' 
+    Resturant = 'Resturants'
 }
