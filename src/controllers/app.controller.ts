@@ -28,7 +28,9 @@ export module AppCtrl {
                 const userData: IUser = await isLegit(reqBody.username, reqBody.password);
                 if(userData) {
                     await userData.updateOne({ lastConnected: Date.now() }).exec();
-                    return res.status(ResponseStatus.Ok).json(userData);
+                    return res.status(ResponseStatus.Ok).json({ auth: true, user: userData });
+                } else {
+                    return res.status(ResponseStatus.Ok).json({ auth: false, description: "Username isn't exists" });
                 }
             } catch(ex) {
                 console.error(ex);
@@ -90,20 +92,24 @@ export module AppCtrl {
     }
 
     async function isUserExists(data: { username?: string, email?: string }): Promise<UserExists> {
-        let userMatch: IUser[] = [];
-        let emailMatch: IUser[] = [];
         let res: UserExists = UserExists.Not;
+        
+        try {
+            // Checking existence of username
+            if(data.username) {
+                const matchUsers: IUser[] = await UserModel.find({ username: data.username }).exec();
+                matchUsers.length > 0 ? res = UserExists.Username : null;
+            }
 
-        if(data.username) {
-            userMatch = await UserModel.find({ username: data.username }).exec();
-            res = UserExists.Username;
+            // Checking existence of mail
+            if(data.email) {
+                const matchEmails: IUser[] = await UserModel.find({ email: data.email }).exec();
+                matchEmails.length > 0 ? res = UserExists.Email : null;
+            }
+        } catch(ex) {
+            console.error(ex);
         }
-
-        if(data.email) {
-            emailMatch = await UserModel.find({ email: data.email }).exec();
-            res = UserExists.Email;
-        }
-
+        
         return res;
     }
 

@@ -25,4 +25,4 @@ AccountSchema.pre<IAccount>('save', async (next: HookNextFunction) => {
     }
 });
 
-export const UserModel: Model<IAccount> = model<IAccount>(CollectionsNames.Accounts, AccountSchema);
+export const AccountModel: Model<IAccount> = model<IAccount>(CollectionsNames.Accounts, AccountSchema);
