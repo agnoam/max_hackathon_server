@@ -24,11 +24,10 @@ export module AppCtrl {
         const reqBody: LoginRequestBody = req.body;
         if(reqBody.username && reqBody.password) {
             try {
-                // Encrypting the password with md5
-                const userData: IUser = await isLegit(reqBody.username, reqBody.password);
+                let userData: IUser = await isLegit(reqBody.username, reqBody.password);                
                 if(userData) {
                     await userData.updateOne({ lastConnected: Date.now() }).exec();
-                    return res.status(ResponseStatus.Ok).json({ auth: true, user: userData });
+                    return res.status(ResponseStatus.Ok).json({ auth: true, user: deleteSecretData(userData) });
                 } else {
                     return res.status(ResponseStatus.Ok).json({ auth: false, description: "Username isn't exists" });
                 }
@@ -127,6 +126,15 @@ export module AppCtrl {
         } catch(ex) {
             console.error(`ex with querying mongodb: `, ex);
         }
+    }
+
+    function deleteSecretData(user: IUser): IUser {
+        user = user.toJSON();
+        delete user.password;
+        delete user.__v;
+        delete user._id;
+
+        return user;
     }
 }
 
