@@ -4,6 +4,7 @@ import { UserModel, IUser } from '../models/user.model';
 import { TransactionModel, ITransaction } from "../models/transaction.model";
 import { AccountModel, IAccount } from "../models/account.model";
 import { DocumentQuery, Types } from "mongoose";
+import { MessageModel, IMessage, Action } from '../models/message.model';
 import md5 from 'md5';
 
 // Required imports for firebase to function properly
@@ -26,11 +27,10 @@ export module AppCtrl {
         const reqBody: LoginRequestBody = req.body;
         if(reqBody.username && reqBody.password) {
             try {
-                // Encrypting the password with md5
-                const userData: IUser = await isLegit(reqBody.username, reqBody.password);
+                let userData: IUser = await isLegit(reqBody.username, reqBody.password);                
                 if(userData) {
                     await userData.updateOne({ lastConnected: Date.now() }).exec();
-                    return res.status(ResponseStatus.Ok).json({ auth: true, user: userData });
+                    return res.status(ResponseStatus.Ok).json({ auth: true, user: deleteSecretData(userData) });
                 } else {
                     return res.status(ResponseStatus.Ok).json({ auth: false, description: "Username isn't exists" });
                 }
@@ -202,6 +202,37 @@ export module AppCtrl {
             return null;
         } catch(ex) {
             console.error(`ex with querying mongodb: `, ex);
+        }
+    }
+
+    function deleteSecretData(user: IUser): IUser {
+        user = user.toJSON();
+        delete user.password;
+        delete user.__v;
+        delete user._id;
+
+        return user;
+    }
+
+    async function newMessage(message: IMessage): Promise<void> {
+        try {
+            await MessageModel.create(message);
+        } catch(ex) {
+            throw {
+                description: 'MessageModel ex',
+                data: ex
+            }
+        }
+    }
+
+    async function newAccount(account: IAccount): Promise<void> {
+        try {
+            await AccountModel.create(account);
+        } catch(ex) {
+            throw {
+                description: 'AccountModel ex',
+                data: ex
+            }
         }
     }
 }
