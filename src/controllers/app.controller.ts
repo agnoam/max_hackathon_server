@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { ResponseStatus } from "../utils/consts";
 import { UserModel, IUser } from '../models/user.model';
+import { MessageModel, IMessage, Action } from '../models/message.model';
+import { AccountModel, IAccount } from './../models/account.model';
 import { DocumentQuery } from "mongoose";
 import md5 from 'md5';
 
@@ -135,6 +137,28 @@ export module AppCtrl {
         delete user._id;
 
         return user;
+    }
+
+    async function newMessage(message: IMessage): Promise<void> {
+        try {
+            await MessageModel.create(message);
+        } catch(ex) {
+            throw {
+                description: 'MessageModel ex',
+                data: ex
+            }
+        }
+    }
+
+    async function newAccount(account: IAccount): Promise<void> {
+        try {
+            await AccountModel.create(account);
+        } catch(ex) {
+            throw {
+                description: 'AccountModel ex',
+                data: ex
+            }
+        }
     }
 }
 
