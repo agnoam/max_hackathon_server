@@ -179,7 +179,7 @@ export module CoriunderRequests {
                         [cred.CredentialsHeaderName]: cred.CredentialsToken
                     }
             });
-            if(res.status === ResponseStatus.ok) {
+            if(res.status === ResponseStatus.Ok) {
                 const resData: { d: CoriunderCustomer } = res.data;
                 return resData.d;
             }
