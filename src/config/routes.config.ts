@@ -4,7 +4,7 @@ import { CoriunderRequests } from "../controllers/coriunder.controller";
 import { ResponseStatus } from "../utils/consts";
 
 console.log("import routes.config");
-
+// todo: login every 15 mins.
 export const RoutesConfig = (app: Application) => {
     // Define the api to where go
     app
@@ -27,6 +27,26 @@ export const RoutesConfig = (app: Application) => {
             try {
                 const cred = await CoriunderRequests.login({ email: "arbfgel@gmail.com", password: "aabb1122" });
                 const resData = await CoriunderRequests.GetBalance(cred);
+                
+                return res.json(resData);
+            } catch(ex) {
+                return res.status(ResponseStatus.InternalError).json({ description: ex });
+            }
+        })
+        .get('/transfer-amount', async (req: Request, res: Response) => {
+            try {
+                const cred = await CoriunderRequests.login({ email: "arbfgel@gmail.com", password: "aabb1122" });
+                const resData = await CoriunderRequests.TransferAmount(cred, req.body.destAccountId, req.body.amount);
+                
+                return res.json(resData);
+            } catch(ex) {
+                return res.status(ResponseStatus.InternalError).json({ description: ex });
+            }
+        })
+        .get('/get-managed-accounts', async (req: Request, res: Response) => {
+            try {
+                const cred = await CoriunderRequests.login({ email: "arbfgel@gmail.com", password: "aabb1122" });
+                const resData = await CoriunderRequests.GetManagedAccounts(cred);
                 
                 return res.json(resData);
             } catch(ex) {
