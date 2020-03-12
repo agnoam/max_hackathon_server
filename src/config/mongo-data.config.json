@@ -1,3 +1,3 @@
 {
-    "uri": "mongodb+srv://admin:mypass@hackathon-tuotk.mongodb.net/hackathon"
+    "uri": "mongodb://max:1234abcd@ds161024.mlab.com:61024/max_finance_app"
 }

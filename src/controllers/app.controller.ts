@@ -186,7 +186,7 @@ export module AppCtrl {
             const userData: IUser = await userQuery.exec();
 
             // Encrypting the password with md5
-            if(userData.password === md5(password)) {
+            if(userData && userData.password === md5(password)) {
                 return userData;
             }
 
