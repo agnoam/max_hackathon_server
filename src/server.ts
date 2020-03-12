@@ -50,3 +50,81 @@ app.listen(port, () => {
 interface NetworkInterface {
   [index: string]: os.NetworkInterfaceInfo[];
 }
+
+// ignore this for now. this is for mock data insertion
+/*
+var fs = require('fs');
+var users = JSON.parse(fs.readFileSync('data\\users.json', 'utf8'));
+var accounts = JSON.parse(fs.readFileSync('data\\accounts.json', 'utf8'));
+var transactions = JSON.parse(fs.readFileSync('data\\transactions.json', 'utf8'));
+
+import { UserModel, IUser } from './models/user.model';
+import { TransactionModel } from './models/transaction.model';
+import { AccountModel, IAccount } from './models/account.model';
+import { Types } from "mongoose";
+
+async function update():Promise<void> {
+  setTimeout(() => {
+    for(let i = 0; i < 200; ++i) {
+      const user = {
+        username: users[i].username,
+        password: users[i].password,
+        accountIds: users[i].accountId,
+        email: users[i].email,
+        name: users[i].name,
+        profileImage: users[i].profileImage,
+        lastConnected: users[i].lastConnected
+      };
+      UserModel.collection.insert(user);
+    }
+    let userI = 0;
+    let accountI = 0;
+    for(let i = 0; i < 201; ++i) {
+      let accountId;
+      if(users[userI].accountId[accountI]) {
+        accountId = users[userI].accountId[accountI];
+        ++accountI;
+      } else {
+        accountI = 0;
+        ++userI;
+        accountId = users[userI].accountId[accountI];
+        ++accountI;
+      }
+      const account = {
+        _id: Types.ObjectId(accountId),
+        balance: accounts[i].balance,
+        secretCode: accounts[i].secretCode,
+        transactionIds: accounts[i].transactionIds
+      };
+      AccountModel.collection.insert(account);
+    }
+    accountI = 0;
+    let transactionI = 0;
+    for(let i = 0; i < 200; ++i) {
+      let transactionId;
+      if(accounts[accountI].transactionIds[transactionI]) {
+        transactionId = accounts[accountI].transactionIds[transactionI];
+        ++transactionI;
+      } else {
+        transactionI = 0;
+        ++accountI;
+        transactionId = accounts[accountI].transactionIds[transactionI];
+        ++transactionI;
+      }
+      // there is no an account with such transactionId before this one
+      if(accounts.indexOf(accounts.find(account => (account.transactionIds.indexOf(transactionId)  !== -1 ) ) ) === accountI) {
+        const transaction = {
+          _id:      Types.ObjectId(transactionId),
+          srcAcc:   transactions[i].srcAcc,
+          destAcc:  transactions[i].destAcc,
+          category: transactions[i].category,
+          amount:   transactions[i].amount
+        };
+        TransactionModel.collection.insert(transaction);
+      }
+    }
+  }, 5000);
+}
+
+// update();
+*/

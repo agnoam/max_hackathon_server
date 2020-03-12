@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
-import { ResponseStatus } from "../utils/consts";
+import { ResponseStatus, Category } from "../utils/consts";
 import { UserModel, IUser } from '../models/user.model';
-import { DocumentQuery } from "mongoose";
+import { TransactionModel, ITransaction } from "../models/transaction.model";
+import { AccountModel, IAccount } from "../models/account.model";
+import { DocumentQuery, Types } from "mongoose";
 import md5 from 'md5';
 
 // Required imports for firebase to function properly
@@ -91,6 +93,80 @@ export module AppCtrl {
         }
     }
 
+    /**
+     * transfer money from accounts
+     * @param req expected to contain body of type ITransaction
+     */
+    export async function transferMoney_R(req: Request, res: Response): Promise<Response> {
+        const reqBody: ITransaction = req.body;
+        if(reqBody.amount <= 0) return res.status(ResponseStatus.Ok).json({ success: false, description: "Amount must be a positive quantity" });
+        const srcAcc: IAccount | null = await AccountModel.findOne( { '_id': Types.ObjectId(reqBody.srcAcc) } ).exec();
+        if(srcAcc !== null) {
+            if(srcAcc.balance >= reqBody.amount) {
+                try {
+                    const destAccount: IAccount | null = await AccountModel.findOne( { '_id': Types.ObjectId(reqBody.destAcc) } ).exec();
+                    if(destAccount === null) {
+                        return res.status(ResponseStatus.Ok).json({ success: false, description: `Destanation account doensn't exist` });
+                    } else {
+                        let insertedDocument = await TransactionModel.collection.insertOne({
+                            srcAcc: reqBody.srcAcc,
+                            destAcc: reqBody.destAcc,
+                            category: reqBody.category,
+                            amount: reqBody.amount
+                        });
+                        
+                        AccountModel.collection.updateOne(
+                            { 
+                                '_id': Types.ObjectId(reqBody.srcAcc) 
+                            },
+                            {
+                                $set: {balance: srcAcc.balance - +reqBody.amount},
+                                $addToSet: {"transactionIds": insertedDocument.insertedId.toHexString()}
+                            }
+                        );
+                        AccountModel.collection.updateOne(
+                            { 
+                                '_id': Types.ObjectId(reqBody.destAcc) 
+                            },
+                            {
+                                $set: {balance: destAccount.balance + +reqBody.amount},
+                                $addToSet: {"transactionIds": insertedDocument.insertedId.toHexString()}
+                            }
+                        );
+                        return res.status(ResponseStatus.Ok).json({ success: true, description: "Transaction executed successfuly" });
+                    }
+                } catch (ex) {
+                    console.log(ex);
+                }
+            } else
+                return res.status(ResponseStatus.Ok).json({ success: false, description: "Insufficient balance" });
+        }
+
+        return res.status(ResponseStatus.BadRequest).json({ success: false, description: `Source account doensn't exist` });
+    }
+
+    /**
+     * gets account by id
+     * @param req id of account
+     */
+    export async function getAccount_R(req: Request, res: Response): Promise<Response> {
+        const id: number = req.body.id;
+        const srcAcc: IAccount | null = await AccountModel.findOne( { '_id': Types.ObjectId(id) } ).exec();
+        if(srcAcc !== null)
+            return res.status(ResponseStatus.Ok).json(srcAcc);
+        return res.status(ResponseStatus.BadRequest).json({ description: `Source account doensn't exist` });
+    }
+
+    /**
+     * todo: ask if card is determined by secretCode. if so, make unique
+     * this does not work yet
+     * determines if a user
+     * @param req contains { username:string, password:string, secretCode:string }
+     */
+    export async function isOwner(req: Request, res: Response): Promise<void> {
+        
+    }
+
     async function isUserExists(data: { username?: string, email?: string }): Promise<UserExists> {
         let res: UserExists = UserExists.Not;
         
@@ -129,6 +205,7 @@ export module AppCtrl {
         }
     }
 }
+
 
 interface LoginRequestBody {
     username: string;

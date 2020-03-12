@@ -2,19 +2,17 @@ import { Document, Model, model, Schema, HookNextFunction, Types } from "mongoos
 import { CollectionsNames, Category } from "../utils/consts";
 
 export interface ITransaction extends Document {
-    id: Types.ObjectId;
-    srcAcc: string; // ID of the source account
-    destAcc: string; // ID of the destination account
+    srcAcc:   string; // ID of the source account
+    destAcc:  string; // ID of the destination account
     category: Category[];
-    amount: number;
+    amount:   number;
 }
 
 const TransactionSchema: Schema = new Schema<ITransaction>({
-    id: { type: Types.ObjectId, required: true, unique: true },
-    srcAcc: { type: String, required: true },
-    destAcc: { type: String, required: true },
-    amount: { type: Number, required: true },
-    category: { type: [ Category ], default: [Category.Transaction] }
+    srcAcc:   { type: String, required: true },
+    destAcc:  { type: String, required: true },
+    category: { type: [ String ], default: [Category.Transaction] },
+    amount:   { type: Number, required: true }
 }, { collection: CollectionsNames.Transactions, _id: false });
 
 /* pre functions */
