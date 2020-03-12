@@ -1,4 +1,4 @@
-import { Document, Model, model, Schema, HookNextFunction, Error } from "mongoose";
+import { Document, Model, model, Schema, HookNextFunction, Error, Types } from "mongoose";
 import { CollectionsNames } from "../utils/consts";
 
 export const userDefaultImage: string = 
@@ -7,7 +7,7 @@ export const userDefaultImage: string =
 export interface IUser extends Document {
     username: string;
     password: string;
-    accountIds: string[];
+    accountIds: Types.ObjectId[];
     email: string;
     name: string;
     profileImage: string;
@@ -21,7 +21,7 @@ const UserSchema: Schema = new Schema<IUser>({
     name: { type: String, required: true },
     profileImage: { type: String, default: userDefaultImage },
     lastConnected: { type: Number, default: Date.now },
-    accountIds: { type: [ String ] } // [ String ] is array of Strings definition
+    accountIds: { type: [ Types.ObjectId ] } // [ Types.ObjectId ] is array of Types.ObjectId definitions
 }, { collection: CollectionsNames.Users });
 
 /* pre functions */
