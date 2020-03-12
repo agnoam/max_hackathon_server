@@ -193,28 +193,23 @@ export module CoriunderRequests {
         const reqBody = {};
         const signature: string = createSignature(reqBody);
 
-        // Headers
-        const reqHeaders = { ...defaultHeaders };
-        reqHeaders[cred.CredentialsHeaderName] = cred.CredentialsToken;
-        reqHeaders['Signature'] = `bytes-SHA256, ${signature}`
-
         try {
             const res: axios.AxiosResponse = await axios.default.post(
-                `${serverURL}/V2/prepaid.svc/Balance`,
-                {
-                    "AccountId": "4580411104588461"
-                }, { 
+                `${serverURL}/V2/balance.svc/GetTotal`,
+                reqBody, { 
                     headers: {
                         ...defaultHeaders, Signature: `bytes-SHA256, ${signature}`, 
                         [cred.CredentialsHeaderName]: cred.CredentialsToken
                     }
             });
+
             if(res.status === ResponseStatus.Ok) {
                 return res.data;
             }
         } catch(ex) {
             console.log(ex);
         }
+        
         return null;
     }
 }
@@ -225,7 +220,7 @@ enum UserRole {
     Affiliate = 25
 }
 
-interface CoriunderCred { 
+export interface CoriunderCred { 
     CredentialsToken: string, 
     CredentialsHeaderName: string 
 }
