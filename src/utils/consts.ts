@@ -15,7 +15,8 @@ export enum CollectionsNames {
     Users = 'users',
     Transactions = 'transactions',
     Accounts = 'accounts',
-    Messages = 'messages'
+    Messages = 'messages',
+    Gifts = 'gifts'
 }
 
 export enum Category {

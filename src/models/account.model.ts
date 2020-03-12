@@ -6,7 +6,6 @@ export interface IAccount extends Document {
     secretCode: string;
     transactionIds: String;
     // currency: // todo: enum ils euro us dollar required 
-
 }
 
 // todo: messages : numericid:number increment required
