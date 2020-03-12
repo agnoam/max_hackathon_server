@@ -156,16 +156,7 @@ export module AppCtrl {
             return res.status(ResponseStatus.Ok).json(srcAcc);
         return res.status(ResponseStatus.BadRequest).json({ description: `Source account doensn't exist` });
     }
-
-    /**
-     * todo: ask if card is determined by secretCode. if so, make unique
-     * this does not work yet
-     * determines if a user
-     * @param req contains { username:string, password:string, secretCode:string }
-     */
-    export async function isOwner(req: Request, res: Response): Promise<void> {
-        
-    }
+    // already registered : meir@6nksdhs.com aabb1122
 
     async function isUserExists(data: { username?: string, email?: string }): Promise<UserExists> {
         let res: UserExists = UserExists.Not;

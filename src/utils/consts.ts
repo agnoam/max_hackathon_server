@@ -15,12 +15,15 @@ export enum CollectionsNames {
     Users = 'users',
     Transactions = 'transactions',
     Accounts = 'accounts',
-    Messages = 'messages'
+    Messages = 'messages',
+    ExpenseVault = 'expenseVault'
 }
 
 export enum Category {
     Transaction = 'Transaction',
     Technology = 'Technology',
     Vacation = 'Vacation',
-    Resturant = 'Resturants'
+    Resturant = 'Resturants',
+    Home = 'Home',
+    Liesure = 'Liesure'
 }
