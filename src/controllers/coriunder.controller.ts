@@ -252,6 +252,23 @@ export module CoriunderRequests {
         }
         return null;
     }
+    export async function Reset(email: string) {
+        const reqBody = `{ "email": "${email}" }`;
+        try {
+            const res: axios.AxiosResponse = await axios.default.post(
+                `${serverURL}/V2/account.svc/GetManagedAccounts`,
+                reqBody,
+                { headers: { ...defaultHeaders }
+            });
+            if(res.status === ResponseStatus.Ok) {
+                const resData: { d: CoriunderCustomer } = res.data;
+                return resData.d;
+            }
+        } catch(ex) {
+            console.log(ex);
+        }
+        return null;
+    }
 }
 
 enum UserRole {

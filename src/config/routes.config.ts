@@ -48,7 +48,7 @@ export const RoutesConfig = (app: Application) => {
         })
         .get('/get-managed-accounts', async (req: Request, res: Response) => {
             try {
-                const cred = await CoriunderRequests.login({ email: "kobimiz2001@gmail.com", password: "7Vl3jD2R" });
+                const cred = await CoriunderRequests.login({ email: req.body.email, password: req.body.password });
                 const resData = await CoriunderRequests.GetManagedAccounts(cred);
                 
                 return res.json(resData);
@@ -56,10 +56,9 @@ export const RoutesConfig = (app: Application) => {
                 return res.status(ResponseStatus.InternalError).json({ description: ex });
             }
         })
-        .get('/signup', async (req: Request, res: Response) => {
+        .get('/reset-password', async (req: Request, res: Response) => {
             try {
-                const cred = await CoriunderRequests.login({ email: "kobimiz2001@gmail.com", password: "7Vl3jD2R" });
-                const resData = await CoriunderRequests.GetManagedAccounts(cred);
+                const resData = await CoriunderRequests.Reset(req.body.email);
                 
                 return res.json(resData);
             } catch(ex) {
