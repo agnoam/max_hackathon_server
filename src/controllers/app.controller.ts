@@ -68,10 +68,19 @@ export module AppCtrl {
         const body: TransferRequestBody = {
             userCred: req.body.creds as CoriunderCred,
             destAccountId: req.body.destAccID,
-            amount: req.body.amount
+            amount: req.body.amount,
+            pinCode: req.body.pinCode,
+            currencyIso: req.body.currencyIso,
+            text: req.body.text
         }
-
-        CoriunderRequests.TransferAmount(body.userCred, body.destAccountId, body.amount);
+        await CoriunderRequests.TransferAmount(
+            body.userCred, 
+            body.destAccountId, 
+            body.amount, 
+            body.pinCode, 
+            body.currencyIso, 
+            body.text
+        );
 
         return null;
     }
@@ -271,6 +280,9 @@ interface TransferRequestBody {
     userCred: CoriunderCred;
     destAccountId: number;
     amount: number;
+    pinCode: string;
+    currencyIso: string;
+    text: string;
 }
 
 enum UserExists {

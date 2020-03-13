@@ -208,10 +208,16 @@ export module CoriunderRequests {
         return null;
     }
 
-    export async function TransferAmount(cred: CoriunderCred, destAccountId: number, amount: number,
-                                            pinCode: string, currencyIso: string, text: string): Promise<CoriunderCustomer> {
+    export async function TransferAmount(
+        cred: CoriunderCred, 
+        destAccountId: number, 
+        amount: number, 
+        pinCode: string, 
+        currencyIso: string, 
+        text: string
+    ): Promise<CoriunderCustomer> {
         const reqBody = 
-    `{ "destAccountId": "${destAccountId}", "amount": "${amount}", "pinCode": "${pinCode}", "currencyIso": "${currencyIso}", "text":"${text}" }`;
+        `{ "destAccountId": "${destAccountId}", "amount": "${amount}", "pinCode": "${pinCode}", "currencyIso": "${currencyIso}", "text":"${text}" }`;
         const signature: string = createSignature(reqBody);
 
         try {
