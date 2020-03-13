@@ -27,7 +27,7 @@ export const RoutesConfig = (app: Application) => {
         })
         .get('/getBalance', async (req: Request, res: Response) => {
             try {
-                const cred = await CoriunderRequests.login({ email: "arbfgel@gmail.com", password: "aabb1122" });
+                const cred = await CoriunderRequests.login({ email: req.body.email, password: req.body.password });
                 const resData = await CoriunderRequests.GetBalance(cred);
                 
                 return res.json(resData);
