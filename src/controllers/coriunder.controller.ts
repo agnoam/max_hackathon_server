@@ -148,7 +148,8 @@ export module CoriunderRequests {
 
             return {
                 CredentialsToken: credToken,
-                CredentialsHeaderName: credHeaderName
+                CredentialsHeaderName: credHeaderName,
+                id: resData.d.Number
             }
         }
 
@@ -207,8 +208,10 @@ export module CoriunderRequests {
         return null;
     }
 
-    export async function TransferAmount(cred: CoriunderCred, destAccountId: number, amount: number): Promise<CoriunderCustomer> {
-        const reqBody = `{ destAccountId :${destAccountId}, amount: ${amount} }`;
+    export async function TransferAmount(cred: CoriunderCred, destAccountId: number, amount: number,
+                                            pinCode: string, currencyIso: string, text: string): Promise<CoriunderCustomer> {
+        const reqBody = 
+    `{ "destAccountId": "${destAccountId}", "amount": "${amount}", "pinCode": "${pinCode}", "currencyIso": "${currencyIso}", "text":"${text}" }`;
         const signature: string = createSignature(reqBody);
 
         try {
@@ -332,6 +335,7 @@ interface CoriunderRegistrationModel {
 export interface CoriunderCred { 
     CredentialsToken: string;
     CredentialsHeaderName: string; 
+    id: string; 
 }
 
 interface CoriunderLoginRes {
