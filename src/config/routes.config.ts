@@ -64,5 +64,15 @@ export const RoutesConfig = (app: Application) => {
             } catch(ex) {
                 return res.status(ResponseStatus.InternalError).json({ description: ex });
             }
+        })
+        .get('/getTransaction', async (req: Request, res: Response) => {
+            try {
+                const resData = await CoriunderRequests.GetTransaction(req.body.id);
+                
+                return res.json(resData);
+            } catch(ex) {
+                return res.status(ResponseStatus.InternalError).json({ description: ex });
+            }
         });
+
 }

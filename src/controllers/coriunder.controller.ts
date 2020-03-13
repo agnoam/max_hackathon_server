@@ -208,7 +208,7 @@ export module CoriunderRequests {
     }
 
     export async function TransferAmount(cred: CoriunderCred, destAccountId: number, amount: number,
-                                            pinCode: string, currencyIso: string, text: string): Promise<CoriunderCustomer> {
+                                            pinCode: string, currencyIso: string, text: string): Promise<boolean> {
         const reqBody = 
     `{ "destAccountId": "${destAccountId}", "amount": "${amount}", "pinCode": "${pinCode}", "currencyIso": "${currencyIso}", "text":"${text}" }`;
         const signature: string = createSignature(reqBody);
@@ -223,7 +223,7 @@ export module CoriunderRequests {
                     }
             });
             if(res.status === ResponseStatus.Ok) {
-                return res.data;
+                return res.data.IsSuccess;
             }
         } catch(ex) {
             console.log(ex);
@@ -256,13 +256,32 @@ export module CoriunderRequests {
         const reqBody = `{ "email": "${email}" }`;
         try {
             const res: axios.AxiosResponse = await axios.default.post(
-                `${serverURL}/V2/account.svc/GetManagedAccounts`,
+                `${serverURL}/V2/account.svc/ResetPassword`,
                 reqBody,
                 { headers: { ...defaultHeaders }
             });
             if(res.status === ResponseStatus.Ok) {
                 const resData: { d: CoriunderCustomer } = res.data;
                 return resData.d;
+            }
+        } catch(ex) {
+            console.log(ex);
+        }
+        return null;
+    }
+
+    export async function GetTransaction(transactionId: number): Promise<CoriunderCustomer> {
+        const reqBody = `{ "transactionId": "${transactionId}" }`;
+        const signature: string = createSignature(reqBody);
+
+        try {
+            const res: axios.AxiosResponse = await axios.default.post(
+                `${serverURL}/V2/Customer.svc/GetTransaction`,
+                    reqBody,
+                    { headers: { ...defaultHeaders } }
+            );
+            if(res.status === ResponseStatus.Ok) {
+                return res.data;
             }
         } catch(ex) {
             console.log(ex);
