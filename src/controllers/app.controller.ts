@@ -19,9 +19,10 @@ export module AppCtrl {
     export async function login_R(req: Request, res: Response): Promise<Response> {
         try {
             const timeToExp: number = 14 * 1000; // 14 minutes until exp date of credentials
-            const creds: CoriunderCred = await CoriunderRequests.login(req.body as { email: string, password: string });
+            const creds: CoriunderCred = 
+                await CoriunderRequests.login(req.body as { email: string, password: string });
             if(creds) {
-                res.status(ResponseStatus.Ok).json({
+                return res.status(ResponseStatus.Ok).json({
                     auth: true,
                     cred: creds,
                     expDate: Date.now() + timeToExp
@@ -35,6 +36,44 @@ export module AppCtrl {
             auth: false,
             description: 'There was an error, Please try again later ?'
         });
+    }
+
+    export async function signUp_R(req: Request, res: Response): Promise<Response> {
+        try {
+            if(req.body.data && req.body.info) {
+                const newID: number = await CoriunderRequests.RegisterCustomer({
+                    data: { password: req.body.data.password, pinCode: req.body.data.pinCode },
+                    info: {
+                        addressLine: req.body.info.addressLine,
+                        city: req.body.info.city,
+                        country: req.body.info.country,
+                        email: req.body.info.email,
+                        firstname: req.body.info.firstname,
+                        lastname: req.body.info.lastname,
+                        postalCode: req.body.info.postalCode
+                    }
+                });    
+                return res.status(ResponseStatus.Ok).json({ id: newID, description: 'Customer registered' });
+            } else {
+                return res.status(ResponseStatus.BadRequest).json({ description: 'Request have missing fields' });
+            }
+        } catch(ex) {
+            console.error(ex);
+        }
+        return res.status(ResponseStatus.InternalError).json({ 
+            description: 'There was an error, Please try again later' });
+    }
+
+    export async function transferAmount_R(req: Request, res: Response): Promise<Response> {
+        const body: TransferRequestBody = {
+            userCred: req.body.creds as CoriunderCred,
+            destAccountId: req.body.destAccID,
+            amount: req.body.amount
+        }
+
+        CoriunderRequests.TransferAmount(body.userCred, body.destAccountId, body.amount);
+
+        return null;
     }
 
     // export async function signUp_R(req: Request, res: Response): Promise<Response> {
@@ -228,10 +267,10 @@ export module AppCtrl {
     // }
 }
 
-
-interface LoginRequestBody {
-    email: string;
-    password: string;
+interface TransferRequestBody {
+    userCred: CoriunderCred;
+    destAccountId: number;
+    amount: number;
 }
 
 enum UserExists {
