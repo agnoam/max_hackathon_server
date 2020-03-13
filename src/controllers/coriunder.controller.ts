@@ -162,18 +162,13 @@ export module CoriunderRequests {
     }
 
     export async function GetCustomer(cred: CoriunderCred): Promise<CoriunderCustomer> {
-        const reqBody = {};
+        const reqBody = "{}";
         const signature: string = createSignature(reqBody);
-
-        // Headers
-        const reqHeaders = { ...defaultHeaders };
-        reqHeaders[cred.CredentialsHeaderName] = cred.CredentialsToken;
-        reqHeaders['Signature'] = `bytes-SHA256, ${signature}`
 
         try {
             const res: axios.AxiosResponse = await axios.default.post(
                 `${serverURL}/V2/customer.svc/GetCustomer`,
-                "", { 
+                reqBody, { 
                     headers: {
                         ...defaultHeaders, Signature: `bytes-SHA256, ${signature}`, 
                         [cred.CredentialsHeaderName]: cred.CredentialsToken
@@ -190,13 +185,35 @@ export module CoriunderRequests {
     } 
 
     export async function GetBalance(cred: CoriunderCred): Promise<CoriunderCustomer> {
-        const reqBody = {};
+        const reqBody = "{}";
         const signature: string = createSignature(reqBody);
 
         try {
             const res: axios.AxiosResponse = await axios.default.post(
-                `${serverURL}/V2/balance.svc/GetTotal`,
-                reqBody, { 
+                `${serverURL}/V2/Balance.svc/GetTotal`,
+                    reqBody, { 
+                    headers: {
+                        ...defaultHeaders, Signature: `bytes-SHA256, ${signature}`, 
+                        [cred.CredentialsHeaderName]: cred.CredentialsToken
+                    }
+            });
+            if(res.status === ResponseStatus.Ok) {
+                return res.data;
+            }
+        } catch(ex) {
+            console.log(ex);
+        }
+        return null;
+    }
+
+    export async function TransferAmount(cred: CoriunderCred, destAccountId: number, amount: number): Promise<CoriunderCustomer> {
+        const reqBody = `{ destAccountId :${destAccountId}, amount: ${amount} }`;
+        const signature: string = createSignature(reqBody);
+
+        try {
+            const res: axios.AxiosResponse = await axios.default.post(
+                `${serverURL}/V2/Balance.svc/TransferAmount`,
+                    reqBody, { 
                     headers: {
                         ...defaultHeaders, Signature: `bytes-SHA256, ${signature}`, 
                         [cred.CredentialsHeaderName]: cred.CredentialsToken
@@ -212,6 +229,28 @@ export module CoriunderRequests {
         
         return null;
     }
+    export async function GetManagedAccounts(cred: CoriunderCred) {
+        const reqBody = "{}";
+        const signature: string = createSignature(reqBody);
+
+        try {
+            const res: axios.AxiosResponse = await axios.default.post(
+                `${serverURL}/V2/Customer.svc/GetManagedAccounts`,
+                reqBody, { 
+                    headers: {
+                        ...defaultHeaders, Signature: `bytes-SHA256, ${signature}`, 
+                        [cred.CredentialsHeaderName]: cred.CredentialsToken
+                    }
+            });
+            if(res.status === ResponseStatus.Ok) {
+                const resData: { d: CoriunderCustomer } = res.data;
+                return resData.d;
+            }
+        } catch(ex) {
+            console.log(ex);
+        }
+        return null;
+    }
 }
 
 enum UserRole {
@@ -221,8 +260,8 @@ enum UserRole {
 }
 
 export interface CoriunderCred { 
-    CredentialsToken: string, 
-    CredentialsHeaderName: string 
+    CredentialsToken: string;
+    CredentialsHeaderName: string; 
 }
 
 interface CoriunderLoginRes {
