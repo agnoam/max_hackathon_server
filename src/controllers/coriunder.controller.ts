@@ -1,6 +1,7 @@
 import * as axios from 'axios';
 import CryptoJS from 'crypto-js';
 import { ResponseStatus } from '../utils/consts';
+import { Query } from 'mongoose';
 
 export module CoriunderRequests {
     const applicationToken: string = 'a5241acd-df32-44ae-a373-590e52c9c78a';
@@ -222,14 +223,17 @@ export module CoriunderRequests {
                         [cred.CredentialsHeaderName]: cred.CredentialsToken
                     }
             });
+
             if(res.status === ResponseStatus.Ok) {
                 return res.data.IsSuccess;
             }
         } catch(ex) {
             console.log(ex);
         }
+        
         return null;
     }
+    
     export async function GetManagedAccounts(cred: CoriunderCred) {
         const reqBody = "{}";
         const signature: string = createSignature(reqBody);
@@ -288,7 +292,49 @@ export module CoriunderRequests {
         }
         return null;
     }
+    /**
+     * @description Creates new customer by Coriunder api
+     * @param registerData register data of the customer
+     * @returns ID of new Customer
+     */
+    export async function RegisterCustomer(registerData: CoriunderRegistrationModel): Promise<number> {
+        const reqBody = {
+            data: {
+                ApplicationToken: applicationToken,
+                Password: registerData.data.password,
+                PinCode: registerData.data.pinCode,
+                info: {
+                    AddressLine1: registerData.info.addressLine,
+                    City: registerData.info.city,
+                    CountryIso: registerData.info.country,
+                    PostalCode: registerData.info.postalCode,
+                    EmailAddress: registerData.info.email, 
+                    FirstName: registerData.info.firstname,
+                    LastName: registerData.info.lastname
+                }
+            }
+        }
+
+        try {
+            const res: axios.AxiosResponse = await axios.default.post(
+                `${serverURL}/V2/customer.svc/RegisterCustomer`,
+                reqBody,
+                { headers: defaultHeaders }
+            );
+            
+            if(res.status === ResponseStatus.Ok) {
+                const resData: { d: CustomerRegistrationResponse } = res.data;
+                if(resData.d.IsSuccess) {
+                    return resData.d.Number;
+                }
+                throw `Operation failed, ${resData.d.Message}`;
+            }
+        } catch(ex) {
+            throw ex;
+        }
+    }
 }
+
 
 enum UserRole {
     Customer = 15,
@@ -296,7 +342,33 @@ enum UserRole {
     Affiliate = 25
 }
 
-interface CoriunderCred { 
+interface CustomerRegistrationResponse {
+    __type: string;
+    Code: number;
+    IsSuccess: boolean;
+    Key: string;
+    Message: string;
+    Number: number; // ID of the new customer
+}
+
+interface CoriunderRegistrationModel {
+    data: {
+        applicationToken?: string;
+        password: string;
+        pinCode: string;
+    },
+    info: {
+        email: string,
+        firstname: string;
+        lastname: string;
+        addressLine: string;
+        city: string;
+        country: string;
+        postalCode: string;
+    }
+}
+
+export interface CoriunderCred { 
     CredentialsToken: string;
     CredentialsHeaderName: string; 
     id: string; 
