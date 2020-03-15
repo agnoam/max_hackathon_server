@@ -1,4 +1,4 @@
-import { Document, Model, model, Schema, HookNextFunction, Types } from "mongoose";
+import { Document, Model, model, Schema, HookNextFunction } from "mongoose";
 import { CollectionsNames, Category } from "../utils/consts";
 
 export interface ITransaction extends Document {
@@ -25,4 +25,5 @@ TransactionSchema.pre<ITransaction>('save', async (next: HookNextFunction) => {
     }
 });
 
-export const TransactionModel: Model<ITransaction> = model<ITransaction>(CollectionsNames.Transactions, TransactionSchema);
+export const TransactionModel: Model<ITransaction> = 
+    model<ITransaction>(CollectionsNames.Transactions, TransactionSchema);

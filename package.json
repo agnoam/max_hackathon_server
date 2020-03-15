@@ -19,6 +19,7 @@
     "@tensorflow/tfjs": "^1.7.0",
     "axios": "^0.19.2",
     "body-parser": "1.18.3",
+    "crypto-js": "^4.0.0",
     "express": "^4.17.1",
     "firebase-admin": "^8.9.2",
     "md5": "^2.2.1",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
+    "@types/crypto-js": "^3.1.43",
     "@types/express": "4.16.1",
     "@types/jest": "24.0.12",
     "@types/mongoose": "^5.7.4",
