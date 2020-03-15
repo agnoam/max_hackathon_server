@@ -156,15 +156,15 @@ export module CoriunderRequests {
         return null;
     }
 
-    function createSignature(body: any): string {
-        const stringifiedBody: string = Object.keys(body).length === 0 ? '' : JSON.stringify(body);
-        const cryptoData: CryptoJS.WordArray = CryptoJS.SHA256(body + hash);
+    function createSignature(body: object): string {
+        const stringifiedBody: string = !body ? '' : JSON.stringify(body);
+        const cryptoData: CryptoJS.WordArray = CryptoJS.SHA256(stringifiedBody + hash);
         
         return CryptoJS.enc.Base64.stringify(cryptoData);
     }
 
     export async function GetCustomer(cred: CoriunderCred): Promise<CoriunderCustomer> {
-        const reqBody = "{}";
+        const reqBody = {};
         const signature: string = createSignature(reqBody);
 
         try {
@@ -187,7 +187,7 @@ export module CoriunderRequests {
     } 
 
     export async function GetBalance(cred: CoriunderCred): Promise<CoriunderCustomer> {
-        const reqBody = "{}";
+        const reqBody = {};
         const signature: string = createSignature(reqBody);
 
         try {
@@ -215,9 +215,11 @@ export module CoriunderRequests {
         pinCode: string, 
         currencyIso: string, 
         text: string
-    ): Promise<CoriunderCustomer> {
-        const reqBody = 
-        `{ "destAccountId": "${destAccountId}", "amount": "${amount}", "pinCode": "${pinCode}", "currencyIso": "${currencyIso}", "text":"${text}" }`;
+    ): Promise<boolean> {
+        const reqBody = { 
+            destAccountId: destAccountId, 
+            amount: amount, pinCode: pinCode, currencyIso: currencyIso, text: text 
+        }
         const signature: string = createSignature(reqBody);
 
         try {
@@ -231,17 +233,17 @@ export module CoriunderRequests {
             });
 
             if(res.status === ResponseStatus.Ok) {
-                return res.data;
+                return res.data.IsSuccess;
             }
         } catch(ex) {
             console.log(ex);
         }
         
-        return null;
+        return false;
     }
     
     export async function GetManagedAccounts(cred: CoriunderCred) {
-        const reqBody = "{}";
+        const reqBody = {};
         const signature: string = createSignature(reqBody);
 
         try {
@@ -256,6 +258,42 @@ export module CoriunderRequests {
             if(res.status === ResponseStatus.Ok) {
                 const resData: { d: CoriunderCustomer } = res.data;
                 return resData.d;
+            }
+        } catch(ex) {
+            console.log(ex);
+        }
+        return null;
+    }
+    export async function Reset(email: string) {
+        const reqBody = `{ "email": "${email}" }`;
+        try {
+            const res: axios.AxiosResponse = await axios.default.post(
+                `${serverURL}/V2/account.svc/ResetPassword`,
+                reqBody,
+                { headers: { ...defaultHeaders }
+            });
+            if(res.status === ResponseStatus.Ok) {
+                const resData: { d: CoriunderCustomer } = res.data;
+                return resData.d;
+            }
+        } catch(ex) {
+            console.log(ex);
+        }
+        return null;
+    }
+
+    export async function GetTransaction(transactionId: number): Promise<CoriunderCustomer> {
+        const reqBody = { transactionId: transactionId };
+        const signature: string = createSignature(reqBody);
+
+        try {
+            const res: axios.AxiosResponse = await axios.default.post(
+                `${serverURL}/V2/Customer.svc/GetTransaction`,
+                    reqBody,
+                    { headers: { ...defaultHeaders } }
+            );
+            if(res.status === ResponseStatus.Ok) {
+                return res.data;
             }
         } catch(ex) {
             console.log(ex);
@@ -304,6 +342,65 @@ export module CoriunderRequests {
             throw ex;
         }
     }
+
+    export async function GetRows(
+        creds: CoriunderCred, 
+        filters:{CurrencyIso:string}, 
+        sortAndPage:{PageNumber:number, PageSize:number}
+    ): Promise<Page[]> {
+        const reqBody = { 
+            creds: { 
+                CredentialsToken: creds.CredentialsToken, 
+                CredentialsHeaderName: creds.CredentialsHeaderName, 
+                id: creds.id 
+            }, 
+            filters: { CurrencyIso: filters.CurrencyIso }, 
+            sortAndPage: { PageNumber: sortAndPage.PageNumber, PageSize: sortAndPage.PageSize } 
+        }
+        const signature: string = createSignature(reqBody);
+
+        try {
+            const res: axios.AxiosResponse = await axios.default.post(
+                `${serverURL}/V2/Balance.svc/GetRows`,
+                    reqBody, { 
+                    headers: {
+                        ...defaultHeaders, Signature: `bytes-SHA256, ${signature}`, 
+                        [creds.CredentialsHeaderName]: creds.CredentialsToken
+                    }
+            });
+
+            if(res.status === ResponseStatus.Ok) {
+                return res.data;
+            }
+        } catch(ex) {
+            console.log(ex);
+        }
+        
+        return null;
+    }
+}
+
+export interface Page {
+    __type: String;
+    Amount: Number;
+    CurrencyIso: String;
+    ID: String;
+    InsertDate: String;
+    IsPending: Boolean;
+    SourceAccountID: String;
+    SourceAccountName: String;
+    SourceAccountProfileImage: String;
+    SourceAccountProfileImageSize: Number;
+    SourceAccountType: String;
+    SourceID: String;
+    SourceType: String;
+    TargetAccountID: Number;
+    TargetAccountName: String;
+    TargetAccountProfileImage: String;
+    TargetAccountProfileImageSize: Number;
+    TargetAccountType: String;
+    Text: String;
+    Total: Number;
 }
 
 enum UserRole {

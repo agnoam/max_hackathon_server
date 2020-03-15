@@ -8,7 +8,7 @@ import { DBDriver } from "./config/mongo.config";
 // import { initializeFirebase } from './config/firebase.config';
 
 const app: express.Application = express();
-const port: number = +process.env.PORT || 8010; // + means cast to number type in typescript
+const port: number = +process.env.PORT || 8810; // + means cast to number type in typescript
 
 // Get the server's local ip
 const ifaces: NetworkInterface = os.networkInterfaces();

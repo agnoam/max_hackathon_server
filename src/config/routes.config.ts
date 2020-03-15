@@ -24,46 +24,6 @@ export const RoutesConfig = (app: Application) => {
         })
         .get('/', (req: Request, res: Response) => {
             res.send('node-ts server is running ;)');
-        })
-        .get('/getBalance', async (req: Request, res: Response) => {
-            try {
-                const cred = await CoriunderRequests.login({ email: "arbfgel@gmail.com", password: "aabb1122" });
-                const resData = await CoriunderRequests.GetBalance(cred);
-                
-                return res.json(resData);
-            } catch(ex) {
-                return res.status(ResponseStatus.InternalError).json({ description: ex });
-            }
-        })
-        .get('/transfer-amount', async (req: Request, res: Response) => {
-            try {
-                const cred = await CoriunderRequests.login({ email: req.body.email, password: req.body.password });
-                const resData = await CoriunderRequests.TransferAmount(cred, req.body.destAccountId, req.body.amount,
-                                    req.body.pinCode, req.body.currencyIso, req.body.text);
-                
-                return res.json(resData);
-            } catch(ex) {
-                return res.status(ResponseStatus.InternalError).json({ description: ex });
-            }
-        })
-        .get('/get-managed-accounts', async (req: Request, res: Response) => {
-            try {
-                const cred = await CoriunderRequests.login({ email: "kobimiz2001@gmail.com", password: "7Vl3jD2R" });
-                const resData = await CoriunderRequests.GetManagedAccounts(cred);
-                
-                return res.json(resData);
-            } catch(ex) {
-                return res.status(ResponseStatus.InternalError).json({ description: ex });
-            }
-        })
-        .get('/signup', async (req: Request, res: Response) => {
-            try {
-                const cred = await CoriunderRequests.login({ email: "kobimiz2001@gmail.com", password: "7Vl3jD2R" });
-                const resData = await CoriunderRequests.GetManagedAccounts(cred);
-                
-                return res.json(resData);
-            } catch(ex) {
-                return res.status(ResponseStatus.InternalError).json({ description: ex });
-            }
         });
+
 }
