@@ -25,5 +25,4 @@ export const RoutesConfig = (app: Application) => {
         .get('/', (req: Request, res: Response) => {
             res.send('node-ts server is running ;)');
         });
-
 }

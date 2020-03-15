@@ -164,7 +164,7 @@ export module CoriunderRequests {
     }
 
     export async function GetCustomer(cred: CoriunderCred): Promise<CoriunderCustomer> {
-        const reqBody = {};
+        const reqBody = null;
         const signature: string = createSignature(reqBody);
 
         try {
@@ -255,6 +255,7 @@ export module CoriunderRequests {
                         [cred.CredentialsHeaderName]: cred.CredentialsToken
                     }
             });
+        
             if(res.status === ResponseStatus.Ok) {
                 const resData: { d: CoriunderCustomer } = res.data;
                 return resData.d;
@@ -262,16 +263,19 @@ export module CoriunderRequests {
         } catch(ex) {
             console.log(ex);
         }
+        
         return null;
     }
+
     export async function Reset(email: string) {
-        const reqBody = `{ "email": "${email}" }`;
+        const reqBody = { email };
         try {
             const res: axios.AxiosResponse = await axios.default.post(
                 `${serverURL}/V2/account.svc/ResetPassword`,
                 reqBody,
                 { headers: { ...defaultHeaders }
             });
+            
             if(res.status === ResponseStatus.Ok) {
                 const resData: { d: CoriunderCustomer } = res.data;
                 return resData.d;
@@ -279,6 +283,7 @@ export module CoriunderRequests {
         } catch(ex) {
             console.log(ex);
         }
+        
         return null;
     }
 
@@ -290,7 +295,7 @@ export module CoriunderRequests {
             const res: axios.AxiosResponse = await axios.default.post(
                 `${serverURL}/V2/Customer.svc/GetTransaction`,
                     reqBody,
-                    { headers: { ...defaultHeaders } }
+                    { headers: { ...defaultHeaders,  } }
             );
             if(res.status === ResponseStatus.Ok) {
                 return res.data;
@@ -402,6 +407,7 @@ export interface Page {
     Text: String;
     Total: Number;
 }
+
 
 enum UserRole {
     Customer = 15,
