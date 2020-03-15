@@ -32,7 +32,7 @@ export module AppCtrl {
                     await userData.updateOne({ lastConnected: Date.now() }).exec();
                     return res.status(ResponseStatus.Ok).json({ auth: true, user: deleteSecretData(userData) });
                 } else {
-                    return res.status(ResponseStatus.Ok).json({ auth: false, description: "Username isn't exists" });
+                    return res.status(ResponseStatus.Ok).json({ auth: false, description: "Username doesn't exists" });
                 }
             } catch(ex) {
                 console.error(ex);
@@ -184,6 +184,10 @@ export module AppCtrl {
             }
         } catch(ex) {
             console.error(ex);
+            throw {
+                description: 'User existence check ex',
+                data: ex
+            }
         }
         
         return res;
