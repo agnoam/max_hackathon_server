@@ -92,6 +92,10 @@ export module AppCtrl {
             return res.status(ResponseStatus.Ok).json({ isTransfered });
         } catch(ex) {
             console.error(ex);
+            throw {
+                description: 'User existence check ex',
+                data: ex
+            }
         }
 
         return res.status(ResponseStatus.InternalError).json({ 

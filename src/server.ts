@@ -51,6 +51,7 @@ interface NetworkInterface {
   [index: string]: os.NetworkInterfaceInfo[];
 }
 
+
 // ignore this for now. this is for mock data insertion
 /*
 var fs = require('fs');
