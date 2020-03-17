@@ -193,18 +193,20 @@ export module CoriunderRequests {
         try {
             const res: axios.AxiosResponse = await axios.default.post(
                 `${serverURL}/V2/Balance.svc/GetTotal`,
-                    reqBody, { 
-                    headers: {
-                        ...defaultHeaders, Signature: `bytes-SHA256, ${signature}`, 
-                        [cred.CredentialsHeaderName]: cred.CredentialsToken
-                    }
+                reqBody, { 
+                headers: {
+                    ...defaultHeaders, Signature: `bytes-SHA256, ${signature}`, 
+                    [cred.CredentialsHeaderName]: cred.CredentialsToken
+                }
             });
+
             if(res.status === ResponseStatus.Ok) {
                 return res.data;
             }
         } catch(ex) {
             console.log(ex);
         }
+
         return null;
     }
 
@@ -350,8 +352,8 @@ export module CoriunderRequests {
 
     export async function GetRows(
         creds: CoriunderCred, 
-        filters:{CurrencyIso:string}, 
-        sortAndPage:{PageNumber:number, PageSize:number}
+        filters: { CurrencyIso: string }, 
+        sortAndPage:{ PageNumber: number, PageSize: number }
     ): Promise<Page[]> {
         const reqBody = { 
             creds: { 

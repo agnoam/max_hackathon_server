@@ -99,8 +99,9 @@ export module AppCtrl {
     }
 
     export async function getBalance_R(req: Request, res: Response): Promise<Response> {
+        console.log('getBalance_R executed');
         try {
-            const cred: CoriunderCred = req.body.creds;
+            const cred: CoriunderCred = req.body.creds as CoriunderCred;
             const resData = await CoriunderRequests.GetBalance(cred);
             
             return res.status(ResponseStatus.Ok).json(resData);

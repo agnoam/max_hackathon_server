@@ -4,7 +4,6 @@ import { CoriunderRequests } from "../controllers/coriunder.controller";
 import { ResponseStatus } from "../utils/consts";
 
 console.log("import routes.config");
-// todo: login every 15 mins.
 export const RoutesConfig = (app: Application) => {
     // Define the api to where go
     app
