@@ -3,7 +3,7 @@ import { CollectionsNames, Category } from "../utils/consts";
 
 export interface IAccount extends Document {
     balance: number;
-    secretCode: string;
+    pinCode: string;
     transactionIds: String;
     // currency: // todo: enum ils euro us dollar required 
 }
@@ -12,8 +12,7 @@ export interface IAccount extends Document {
 
 const AccountSchema: Schema = new Schema<IAccount>({
     balance: { type: Number, required: true },
-    secretCode: { type: String, required: true },
-    transactionIds: { type: [ String ] },
+    pinCode: { type: String, required: true }
 }, { collection: CollectionsNames.Accounts, _id: false });
 
 /* pre functions */

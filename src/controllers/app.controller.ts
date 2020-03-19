@@ -30,8 +30,8 @@ export module AppCtrl {
     export async function getRows_R(req: Request, res: Response): Promise<Response> {
         try {
             const rows: Page[] = await CoriunderRequests.GetRows(
-                req.body.creds, 
-                req.body.filters, 
+                req.body.creds as CoriunderCred, 
+                req.body.filters,
                 req.body.sortAndPage
             );
 
@@ -91,11 +91,10 @@ export module AppCtrl {
 
             return res.status(ResponseStatus.Ok).json({ isTransfered });
         } catch(ex) {
-            console.error(ex);
-            throw {
+            console.error({
                 description: 'User existence check ex',
                 data: ex
-            }
+            });
         }
 
         return res.status(ResponseStatus.InternalError).json({ 

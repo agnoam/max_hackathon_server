@@ -10,129 +10,6 @@ export module CoriunderRequests {
 
     const defaultHeaders = { "Content-Type": "application/json", applicationToken }
 
-    // export async function accountAdd(requestData: { AccountId?: number, Currency?: string }): Promise<any> {
-    //     try {
-    //         const res: axios.AxiosResponse = await axios.default.post(
-    //             `${ serverURL }/AccountAdd`, requestData, { headers: defaultHeaders });
-
-    //         console.log(res);
-    //     } catch(ex) {
-    //         console.error(ex);
-    //     }
-    // }
-    // export async function cardActivate(requestData: CardActivateData): Promise<any> {
-    //     try {
-    //         const res: axios.AxiosResponse = await axios.default.post(
-    //             `${ serverURL }/ActivateCard`, requestData, { headers: defaultHeaders });
-            
-    //         console.log(res);
-    //     } catch(ex) {
-    //         console.error(ex);
-    //     }
-    // }
-
-    // export async function cardActivateV2(requestData: { requestParams?: PrePaidRP }): Promise<any> {
-    //     try {
-    //         const res: axios.AxiosResponse= await axios.default.post(
-    //             `${ serverURL }/ActivateCardV2`,requestData,{ headers:defaultHeaders});
-
-    //         console.log(res);
-    //     } catch(ex) {
-    //         console.error(ex);
-    //     }
-
-    // }
-
-    // export async function AssignUser(requestData: { AccountId?: Long ,AccountNum?:string}): Promise<any> {
-    //     try {
-    //         const res: axios.AxiosResponse= await axios.default.post(
-    //             `${ serverURL }/AssignUser`,requestData,{ headers:defaultHeaders});
-
-    //         console.log(res);
-    //     } catch(ex) {
-    //         console.error(ex);
-    //     }
-
-    // }
-    // export async function Balance(requestData: { AccountId?: Long ,pin?:string}): Promise<any> {
-    //     try {
-    //         const res: axios.AxiosResponse= await axios.default.post(
-    //             `${ serverURL }/Balance`,requestData,{ headers:defaultHeaders});
-
-    //         console.log(res);
-    //     } catch(ex) {
-    //         console.error(ex);
-    //     }
-
-    // }
-    // export async function BlockCard(requestData: { AccountId?: Long ,PIN?:string}): Promise<any> {
-    //     try {
-    //         const res: axios.AxiosResponse= await axios.default.post(
-    //             `${ serverURL }/BlockCard`,requestData,{ headers:defaultHeaders});
-
-    //         console.log(res);
-    //     } catch(ex) {
-    //         console.error(ex);
-    //     }
-
-    // }
-    // export async function CardDebitRequest(requestData: { requestParams?: PrePaidRP }): Promise<any> {
-    //     try {
-    //         const res: axios.AxiosResponse= await axios.default.post(
-    //             `${ serverURL }/CardDebitRequest`,requestData,{ headers:defaultHeaders});
-
-    //         console.log(res);
-    //     } catch(ex) {
-    //         console.error(ex);
-    //     }
-
-    // }
-
-    // export async function CardInfo(requestData: { AccountId?: Long }): Promise<any> {
-    //     try {
-    //         const res: axios.AxiosResponse= await axios.default.post(
-    //             `${ serverURL }/CardInfo`,requestData,{ headers:defaultHeaders});
-
-    //         console.log(res);
-    //     } catch(ex) {
-    //         console.error(ex);
-    //     }
-
-    // }
-    // export async function CardIssueRequestV2(requestData: { requestParams?: PrePaidRP }): Promise<any> {
-    //     try {
-    //         const res: axios.AxiosResponse= await axios.default.post(
-    //             `${ serverURL }/CardIssueRequestV2`,requestData,{ headers:defaultHeaders});
-
-    //         console.log(res);
-    //     } catch(ex) {
-    //         console.error(ex);
-    //     }
-
-    // }
-    // export async function CardIssueRequestWithDelvAddress(requestData: { requestParams?: PrePaidRP }): Promise<any> {
-    //     try {
-    //         const res: axios.AxiosResponse= await axios.default.post(
-    //             `${ serverURL }/CardIssueRequestWithDelvAddress`,requestData,{ headers:defaultHeaders});
-
-    //         console.log(res);
-    //     } catch(ex) {
-    //         console.error(ex);
-    //     }
-
-    // }
-    // export async function CardPIN(requestData: { AccountId?: Long , ValidThru?:string , SecurityCode?:string , PIN?:string }): Promise<any> {
-    //     try {
-    //         const res: axios.AxiosResponse= await axios.default.post(
-    //             `${ serverURL }/CardIssueRequestWithDelvAddress`,requestData,{ headers:defaultHeaders});
-
-    //         console.log(res);
-    //     } catch(ex) {
-    //         console.error(ex);
-    //     }
-
-    // }
-
     export async function login(data: { email: string, password: string }): Promise<CoriunderCred> {
         const res: axios.AxiosResponse = await axios.default.post(`${serverURL}/v2/account.svc/Login`, {
             email: data.email,
@@ -145,11 +22,13 @@ export module CoriunderRequests {
             const resData: { d: CoriunderLoginRes } = res.data;
             const credHeaderName: string = resData.d.CredentialsHeaderName;
             const credToken: string = resData.d.CredentialsToken;
-
-            return {
-                CredentialsToken: credToken,
-                CredentialsHeaderName: credHeaderName,
-                id: resData.d.Number
+            
+            if(credToken && credHeaderName && resData.d.Number) {
+                return {
+                    CredentialsToken: credToken,
+                    CredentialsHeaderName: credHeaderName,
+                    id: resData.d.Number
+                }
             }
         }
 
@@ -296,9 +175,9 @@ export module CoriunderRequests {
         try {
             const res: axios.AxiosResponse = await axios.default.post(
                 `${serverURL}/V2/Customer.svc/GetTransaction`,
-                    reqBody,
-                    { headers: { ...defaultHeaders,  } }
+                reqBody, { headers: { ...defaultHeaders  } }
             );
+            
             if(res.status === ResponseStatus.Ok) {
                 return res.data;
             }
@@ -334,8 +213,7 @@ export module CoriunderRequests {
         try {
             const res: axios.AxiosResponse = await axios.default.post(
                 `${serverURL}/V2/customer.svc/RegisterCustomer`,
-                reqBody,
-                { headers: defaultHeaders }
+                reqBody, { headers: defaultHeaders }
             );
             
             if(res.status === ResponseStatus.Ok) {
@@ -352,23 +230,17 @@ export module CoriunderRequests {
 
     export async function GetRows(
         creds: CoriunderCred, 
-        filters: { CurrencyIso: string }, 
-        sortAndPage:{ PageNumber: number, PageSize: number }
-    ): Promise<Page[]> {
-        const reqBody = { 
-            creds: { 
-                CredentialsToken: creds.CredentialsToken, 
-                CredentialsHeaderName: creds.CredentialsHeaderName, 
-                id: creds.id 
-            }, 
-            filters: { CurrencyIso: filters.CurrencyIso }, 
-            sortAndPage: { PageNumber: sortAndPage.PageNumber, PageSize: sortAndPage.PageSize } 
+        filters: { CurrencyIso: string } = { CurrencyIso: "ILS" }, 
+        sortAndPage: { PageNumber: number, PageSize: number } = { 
+            PageNumber: 1, PageSize: 10
         }
+    ): Promise<Page[]> {
+        const reqBody = { filters, sortAndPage };
         const signature: string = createSignature(reqBody);
 
         try {
             const res: axios.AxiosResponse = await axios.default.post(
-                `${serverURL}/V2/Balance.svc/GetRows`,
+                `${serverURL}/V2/balance.svc/GetRows`,
                     reqBody, { 
                     headers: {
                         ...defaultHeaders, Signature: `bytes-SHA256, ${signature}`, 
@@ -377,7 +249,7 @@ export module CoriunderRequests {
             });
 
             if(res.status === ResponseStatus.Ok) {
-                return res.data;
+                return res.data.d;
             }
         } catch(ex) {
             console.log(ex);
